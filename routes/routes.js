@@ -16,6 +16,8 @@ router.get("/api/devices/:id", showDeviceByID );
 //update the Device status
 router.put("/api/devices/:id", updateDeviceStatus );
 
+//user
+router.put("/api/users/:id")
 //export default router
 
 export default router;
