@@ -1,0 +1,16 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 8300,
+            "driver": "MySQL",
+            "name": "Database",
+            "database": "database.db",
+            "username": "user"
+        }
+    ]
+}
