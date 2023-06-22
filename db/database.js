@@ -1,6 +1,5 @@
 
 
-
 import sqlite3 from "sqlite3";
 // Create a new database instance
 const db = new sqlite3.Database('./database.db');

@@ -10,6 +10,7 @@ export const showDevices= (req, res) => {
     getallDevices( (err,results) => {
         if(err) {
             res.status(500).send(err);
+            console.log("Error with the Controller getallDevices");
         }
         else {
             res.status(200).json(results);  
