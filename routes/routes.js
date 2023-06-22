@@ -3,6 +3,7 @@ import express from "express";
 
 //import functions from controllers
 import { showDevices, showDeviceByID, updateDeviceStatus } from "../controllers/device.js";
+import { showUserByID } from "../controllers/user.js";
 
 //init express router
 const router = express.Router();
@@ -16,8 +17,8 @@ router.get("/api/devices/:id", showDeviceByID );
 //update the Device status
 router.put("/api/devices/:id", updateDeviceStatus );
 
-//user
-router.put("/api/users/:id")
+//get user by id
+router.get("/api/users/:id", showUserByID )
 //export default router
 
 export default router;
