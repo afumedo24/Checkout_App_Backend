@@ -30,14 +30,14 @@ export const getDeviceByID=(id, result) => {
 
 
 //update the device status
-export const updateDevice = (data, result) => { 
-    db.run("UPDATE device SET status = ?, WHRERE id = ? ", [data.device_status], id, (err, results) => {
+export const updateDeviceStatus = ( newstatus, id, result) => { 
+    db.run("UPDATE device SET status = ? WHERE id = ? ", newstatus, id , (err, results) => {
         if(err) {
             console.log("Error with the updateDevice Modal: "  , err);
             result(err, null);   
         }
         else {
-            result(null, 'Successfully updated Device Status');
+            result(null, results);
         }
     } )
 }

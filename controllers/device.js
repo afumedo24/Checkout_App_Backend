@@ -2,7 +2,7 @@
 import {
     getallDevices,
     getDeviceByID,
-    updateDevice,
+    updateDeviceStatus,
 } from "../models/DeviceModel.js";
 
 //get all Devices
@@ -34,15 +34,15 @@ export const showDeviceByID=(req,res) => {
 }
 
 //update device status 
-export const updateDeviceStatus=(req,res) => {
-    const data = req.body;
-    const id = req.params.id;
-    updateDevice(data, id, (err, results) => {
+export const updateDeviceStatusByID=(req,res) => {
+    const status = req.body.status;
+    const id  = req.params.id;
+    updateDeviceStatus(status, id, (err, results) => {
         if(err) {
-            res.send(err);
+            res.status(500).send(err);
         }
         else {
-            res.json(results);  
+            res.status(200).json('Success');  
         }
     });
 }
