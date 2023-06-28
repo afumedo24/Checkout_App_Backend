@@ -122,15 +122,10 @@ function getDeviceStatus(deviceId) {
         if (err) {
           reject(err);
         } else if (!results) {
-
-            //console.log(` deviceID: ${deviceId} -> ID: ${results}`);
-           // console.log(row);
           resolve('Available'); // Device not found in device_owner table, so it's available
         } else if (results.return_date === null) {
-            //console.log(`deviceID: ${deviceId} -> ID: ${results.device_id} ---- return date: ${results.return_date} + U`);
-          resolve('Unavailable'); // Device found in device_owner table, but return_date is null, so it's unavailable
+          resolve('Borrowed'); // Device found in device_owner table, but return_date is null, so it's unavailable
         } else {
-            //console.log(`A` );
           resolve('Available'); // Device found in device_owner table and return_date is not null, so it's available
         }
       });
