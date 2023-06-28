@@ -118,7 +118,8 @@ export const mapDeviceStatus=(req,res) => {
 // Query the device_owner table to check if the device exists and get its status
 function getDeviceStatus(deviceId) {
     return new Promise((resolve, reject) => {
-      db.get('SELECT * FROM device_owner WHERE device_id = ?', deviceId, (err, results) => {
+        // order by desc damit wir den neusten eintrag haben 
+      db.get('SELECT * FROM device_owner WHERE device_id = ? ORDER BY id DESC', deviceId, (err, results) => {
         if (err) {
           reject(err);
         } else if (!results) {
