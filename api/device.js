@@ -74,6 +74,8 @@ export const updateDeviceStatusByID=(req,res) => {
     })
 }
 
+
+
 /*
 
 //get all Devices
