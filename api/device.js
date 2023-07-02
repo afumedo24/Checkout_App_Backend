@@ -3,6 +3,25 @@
 import db from '../db/database.js';
 
 
+// Query the device_owner table to check if the device exists and get its status
+function getDeviceStatus(deviceId) {
+    return new Promise((resolve, reject) => {
+        // order by desc damit wir den neusten eintrag haben 
+      db.get('SELECT * FROM device_owner WHERE device_id = ? ORDER BY id DESC', deviceId, (err, results) => {
+        if (err) {
+          reject(err);
+        } else if (!results) {
+          resolve('Available'); // Device not found in device_owner table, so it's available
+        } else if (results.return_date === null) {
+          resolve('Borrowed'); // Device found in device_owner table, but return_date is null, so it's unavailable
+        } else {
+          resolve('Available'); // Device found in device_owner table and return_date is not null, so it's available
+        }
+      });
+    });
+  }
+  
+
 // get all device with the status fom the database
 export const showAllDeviceswithStatus=(req, res) => {
    
@@ -12,11 +31,10 @@ export const showAllDeviceswithStatus=(req, res) => {
             res.status(500).send({ message: "Error with Server while getting all Devices" });   
         }
         else {
+
             const devicesWithStatus = await Promise.all(
                 results.map(async device => {
-                  //console.log(device.id);
                   const status = await getDeviceStatus(device.id);
-                  //console.log(newstatus);
                   return { ...device, status };
                 })
             );
@@ -59,82 +77,67 @@ export const showSingleDeviceByID=(req,res) => {
     })
 }
 
-//update device status 
-export const updateDeviceStatusByID=(req,res) => {
-    const devicestatus = req.body.status;
-    const deviceid  = req.params.id;
-
-    db.run("UPDATE device SET status = ? WHERE id = ? ", devicestatus, deviceid , (err, results) => {
-        if(err) {
-            console.log("Error with the updateDeviceStatusByID Function\n Error: "  , err);
-            res.status(500).send({ message: "Error with Server while updating the Device status " });     
-        }
-        
-        res.status(200).send({ message: "Device Status updated successfully "}); 
-    })
-}
-
-
 
 /*
+    this function is for the borrowing/returning Process 
+    we extract the required properties from the request body for
+    the database entry then we find for the newstatus 
 
-//get all Devices
-export const showAllDevices=(req, res) => {
-    db.all("SELECT * FROM device" , (err, results) =>{
-        if(err){
-            console.log("Error with the showAllDevices Function\n Error: "  , err);
-            res.status(500).send({ message: "Error with Server while getting all Devices" });   
+*/
+export const setDeviceAsBorrowed=(req, res) =>  {
+    // 
+    const username = req.body.username;
+    const deviceid = req.body.deviceid;
+    const newstatus = req.body.newstatus;
+    const date = req.body.date;
+
+    if(newstatus === 'borrowing' ) {
+        db.run("INSERT INTO device_owner (device_id, name, receive_date) VALUES (?, ?, ?)", deviceid , username, date, (err, results) => {
+            if(err) {
+                console.log("Error with the setDeviceasBorrowed Function\n Error: "  , err);
+                res.status(500).send({ message: "Error with Server while setting the Device status " });     
+            }
+
+            res.status(200).send({ message: "Device successfully borrowed "}); 
+        }) 
+    }
+
+    else {
+        db.run("UPDATE device_owner SET return_date = ?  WHERE device_id = ?", date, deviceid , (err, results) => {
+            if(err) {
+                console.log("Error with the setDeviceasBorrowed Function\n Error: "  , err);
+                res.status(500).send({ message: "Error with Server while setting the Device status " });     
+            }
+    
+            res.status(200).send({ message: "Device successfully returned back "}); 
+        }) 
+    }
+}
+
+
+// get all borrowed Devices of a user from database
+export const showAllBorrowedDevice=(req, res) => {
+
+    const name = req.params.user;
+    db.all(`SELECT do.*, d.name, d.image FROM device_owner do 
+            JOIN device d ON do.device_id = d.id
+            WHERE do.name = ? AND do.return_date IS NULL` , name, async (err, results) => {
+        if(err) {
+            console.log("Error with the showAllBorrowedDevice Function\n Error: "  , err);
+            res.status(500).send({ message: "Error with Server while fetching all borrowed Devices" });     
         }
         else {
-            res.status(200).send(results);
+            const devicesWithStatus = await Promise.all(
+                results.map(async device => {
+                  const status = await getDeviceStatus(device.device_id);
+                  return { ...device, status };
+                })
+            );
+            res.status(200).send(devicesWithStatus);
         }
     })
 }
 
-
-
-//update device status 
-export const mapDeviceStatus=(req,res) => {
-
-    // Modify the API response from Step 2 to include the device status
-    db.all('SELECT * FROM devices', async (err, rows) => {
-      if (err) {
-        console.error('Error fetching devices:', err);
-        res.sendStatus(500);
-      } else {
-        // Iterate over the devices and determine their statuses
-        const devicesWithStatus = await Promise.all(
-          rows.map(async device => {
-            console.log(rows);
-            const status = await getDeviceStatus(device.id);
-            return { ...device, status };
-          })
-        );
-          console.log(devicesWithStatus);
-        res.status(200).json(rows);
-      }
-    });
-};
-*/
-
-// Query the device_owner table to check if the device exists and get its status
-function getDeviceStatus(deviceId) {
-    return new Promise((resolve, reject) => {
-        // order by desc damit wir den neusten eintrag haben 
-      db.get('SELECT * FROM device_owner WHERE device_id = ? ORDER BY id DESC', deviceId, (err, results) => {
-        if (err) {
-          reject(err);
-        } else if (!results) {
-          resolve('Available'); // Device not found in device_owner table, so it's available
-        } else if (results.return_date === null) {
-          resolve('Borrowed'); // Device found in device_owner table, but return_date is null, so it's unavailable
-        } else {
-          resolve('Available'); // Device found in device_owner table and return_date is not null, so it's available
-        }
-      });
-    });
-  }
-  
 
 
 

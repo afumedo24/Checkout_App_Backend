@@ -7,23 +7,20 @@ import cors from  "cors";
 //import routes
 import Router from  "./routes/routes.js";
 
-import cookieParser from "cookie-parser";
 
-//init express
+// init express app
 const app = express();
 
-//use express json
+// use express json
 app.use(express.json());
 
-app.use(cookieParser());
-
-//use cors
+// use cors
 app.use(cors({ credentials: true , origins: ["http://localhost:8100"] }));
 
-//use router 
+// use router 
 app.use(Router);
 
-//PORT 
+// PORT 
 app.listen(8300, ()=> {
     console.log("Server is listening on PORT 8300" );
 })
